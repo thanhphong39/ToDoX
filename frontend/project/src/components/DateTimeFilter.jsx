@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/popover";
 import { options } from "@/lib/data";
 
-const DateTimeFilter = ({dateQuery, setDateQuery}) => {
+const DateTimeFilter = ({ dateQuery, setDateQuery }) => {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -29,7 +29,7 @@ const DateTimeFilter = ({dateQuery, setDateQuery}) => {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className=""
+          className="w-full sm:w-auto"
         >
           {dateQuery
             ? options.find((option) => option.value === dateQuery)?.label
@@ -65,6 +65,6 @@ const DateTimeFilter = ({dateQuery, setDateQuery}) => {
       </PopoverContent>
     </Popover>
   );
-}
+};
 
-export default DateTimeFilter
+export default DateTimeFilter;

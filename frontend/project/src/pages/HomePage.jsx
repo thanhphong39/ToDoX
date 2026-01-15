@@ -4,6 +4,8 @@ import StatsAndFilters from "@/components/StatsAndFilters";
 import TaskList from "@/components/TaskList";
 import TaskListPagination from "@/components/TaskListPagination";
 import DateTimeFilter from "@/components/DateTimeFilter";
+import SearchBar from "@/components/SearchBar";
+import SortSelector from "@/components/SortSelector";
 import Footer from "@/components/Footer";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -16,11 +18,18 @@ const HomePage = () => {
   const [completedTaskCount, setCompletedTaskCount] = useState(0);
   const [filter, setFilter] = useState("all");
   const [dateQuery, setDateQuery] = useState("today");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
   const [page, setPage] = useState(1);
 
   useEffect(() => {
     fetchTasks();
-  }, [dateQuery]);
+  }, [dateQuery, searchQuery, sortBy]);
+
+  useEffect(() => {
+    // Reset page to 1 when filters change
+    setPage(1);
+  }, [filter, searchQuery]);
 
   const handleTaskChanged = () => {
     fetchTasks();
@@ -28,7 +37,13 @@ const HomePage = () => {
 
   const fetchTasks = async () => {
     try {
-      const res = await api.get(`/tasks?filter=${dateQuery}`);
+      const res = await api.get(`/tasks`, {
+        params: {
+          filter: dateQuery,
+          search: searchQuery,
+          sort: sortBy,
+        },
+      });
       setTaskBuffer(res.data.tasks);
       setActiveTaskCount(res.data.activeCount);
       setCompletedTaskCount(res.data.completedCount);
@@ -86,11 +101,21 @@ const HomePage = () => {
         }}
       />
       {/* Your Content/Components */}
-      <div className="container pt-8 mx-auto relative z-10">
-        <div className="w-full max-w-2xl p-6 mx-auto space-y-6">
+      <div className="container pt-4 sm:pt-8 mx-auto relative z-10 px-4 sm:px-6">
+        <div className="w-full max-w-2xl p-3 sm:p-6 mx-auto space-y-4 sm:space-y-6">
           <Header />
 
           <AddTask handleNewTaskAdded={handleNewTaskChanged} />
+
+          {/* <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex-1">
+              <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
+            </div>
+            <SortSelector sortBy={sortBy} setSortBy={setSortBy} />
+          </div> */}
 
           <StatsAndFilters
             filter={filter}
@@ -105,7 +130,7 @@ const HomePage = () => {
             handleTaskChanged={handleTaskChanged}
           />
 
-          <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
+          <div className="flex flex-col items-center justify-between gap-4 sm:gap-6 sm:flex-row">
             <TaskListPagination
               handleNext={handleNext}
               handlePrev={handlePrev}
